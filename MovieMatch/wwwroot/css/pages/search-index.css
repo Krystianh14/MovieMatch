@@ -1,0 +1,311 @@
+/* Auto-wyciągnięte z widoku – dla spójności projektu */
+
+:root {
+            --sidebar-bg: #f8f9fa;
+            --sidebar-border: #e9ecef;
+            --accent-color: #e50914;
+            --text-primary: #212529;
+            --text-secondary: #6c757d;
+            --card-bg: #ffffff;
+            --card-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            --input-border: #ced4da;
+        }
+
+        .search-layout-container {
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            gap: 0;
+            min-height: 80vh;
+            border-top: 1px solid var(--sidebar-border);
+        }
+
+        /* --- LEWY PANEL (SIDEBAR) --- */
+        .search-sidebar {
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--sidebar-border);
+            padding: 2rem 1.5rem;
+        }
+
+        .sidebar-sticky-content {
+            position: sticky;
+            top: 20px;
+        }
+
+        .sidebar-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 0.5rem;
+        }
+
+        .filter-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--input-border);
+            border-radius: 6px;
+            font-size: 0.95rem;
+            transition: border-color 0.2s;
+            background: #fff;
+        }
+
+            .form-input:focus, .form-select:focus {
+                border-color: var(--accent-color);
+                outline: none;
+                box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.1);
+            }
+
+        /* --- TAGI (Gatunki i Platformy) --- */
+        .tags-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .scrollable-tags {
+            max-height: 220px;
+            overflow-y: auto;
+            padding-right: 5px;
+            border: 1px solid transparent;
+        }
+
+            .scrollable-tags::-webkit-scrollbar {
+                width: 6px;
+            }
+
+            .scrollable-tags::-webkit-scrollbar-thumb {
+                background: #ccc;
+                border-radius: 3px;
+            }
+
+        .tag-item input {
+            display: none;
+        }
+
+        .tag-text {
+            display: inline-block;
+            padding: 6px 12px;
+            background-color: #e9ecef;
+            color: #495057;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+            user-select: none;
+        }
+
+        .tag-item input:checked + .tag-text {
+            background-color: var(--accent-color);
+            color: #fff;
+            box-shadow: 0 2px 5px rgba(229, 9, 20, 0.3);
+        }
+
+        .tag-item:hover .tag-text {
+            background-color: #dee2e6;
+        }
+
+        .tag-item input:checked:hover + .tag-text {
+            background-color: #c90812;
+        }
+
+        /* --- PRZYCISK SZUKAJ --- */
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--text-primary);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.3s;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+            .btn-submit:hover {
+                background-color: var(--accent-color);
+            }
+
+        .loader {
+            display: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top: 2px solid #fff;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        /* --- PRAWA STRONA (WYNIKI) --- */
+        .search-results-area {
+            padding: 2rem;
+            background-color: #fff;
+        }
+
+        .results-intro h3 {
+            font-size: 1.75rem;
+            color: var(--text-primary);
+            margin-bottom: 2rem;
+            font-weight: 300;
+        }
+
+        .section-divider {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin: 2rem 0 1rem 0;
+            padding-left: 10px;
+            border-left: 4px solid var(--accent-color);
+            color: var(--text-primary);
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 25px;
+        }
+
+        .movie-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid #f1f1f1;
+        }
+
+            .movie-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 20px rgba(0,0,0,0.12);
+            }
+
+        .card-link {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .card-image-box {
+            position: relative;
+            aspect-ratio: 2/3;
+            background: #eee;
+        }
+
+            .card-image-box img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+        .placeholder-poster {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+
+        .score-bubble {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #fff;
+            color: var(--text-primary);
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .card-content {
+            padding: 10px;
+        }
+
+        .card-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin: 0 0 8px 0;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .vod-icons {
+            display: flex;
+            gap: 5px;
+        }
+
+            .vod-icons img {
+                width: 24px;
+                height: 24px;
+                border-radius: 4px;
+            }
+
+        .no-results {
+            text-align: center;
+            padding: 4rem;
+            color: var(--text-secondary);
+        }
+
+            .no-results .icon {
+                font-size: 3rem;
+                margin-bottom: 1rem;
+                opacity: 0.5;
+            }
+
+        @@keyframes spin {
+            to
+
+        {
+            transform: rotate(360deg);
+        }
+
+        }
+
+        @@media (max-width: 900px) {
+            .search-layout-container
+
+        {
+            grid-template-columns: 280px 1fr;
+        }
+
+        }
+
+        @@media (max-width: 768px) {
+            .search-layout-container {
+                grid-template-columns: 1fr;
+            }
+
+            .search-sidebar {
+                border-right: none;
+                border-bottom: 1px solid var(--sidebar-border);
+                padding: 1.5rem;
+            }
+
+            .sidebar-sticky-content {
+                position: static;
+            }
+
+            .cards-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            }
+        }

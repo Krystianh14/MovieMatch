@@ -1,0 +1,184 @@
+@model MovieMatch.Models.SearchViewModel
+
+@{
+    ViewData["Title"] = "Wyszukiwarka";
+
+    string GetPosterUrl(string path) =>
+        string.IsNullOrEmpty(path) ? "" : $"https://image.tmdb.org/t/p/w300{path}";
+}
+
+<div class="search-layout-container">
+
+    <aside class="search-sidebar">
+        <div class="sidebar-sticky-content">
+            <h2 class="sidebar-title">Filtrowanie</h2>
+
+            <form asp-action="Results" method="get" id="searchForm">
+
+                <div class="filter-section">
+                    <label class="filter-label">Szukana fraza</label>
+                    <input type="text" name="query" value="@Model?.Query" class="form-input" placeholder="Wpisz tytuł..." autocomplete="off" />
+                </div>
+
+                <div class="filter-section">
+                    <label class="filter-label">Rodzaj</label>
+                    <select name="kind" class="form-select">
+                        <option value="All" selected="@(Model.Kind == MovieMatch.Models.TitleKind.All ? "selected" : null)">Wszystko</option>
+                        <option value="Movie" selected="@(Model.Kind == MovieMatch.Models.TitleKind.Movie ? "selected" : null)">Filmy</option>
+                        <option value="Series" selected="@(Model.Kind == MovieMatch.Models.TitleKind.Series ? "selected" : null)">Seriale</option>
+                    </select>
+                </div>
+
+                <div class="filter-section">
+                    <label class="filter-label">Minimalna ocena (0-10)</label>
+                    <input type="number" name="minRating" class="form-input"
+                           step="0.5" min="0" max="10"
+                           value="@(Model.MinRating?.ToString(System.Globalization.CultureInfo.InvariantCulture))" />
+                </div>
+
+                <div class="filter-section">
+                    <label class="filter-label">Platformy VOD</label>
+                    <div class="tags-wrapper">
+                        @foreach (var p in new[] { "Netflix", "HBO Max", "Amazon Prime Video", "Disney+", "Apple TV+", "SkyShowtime", "Viaplay", "Player", "Canal+ Online", "TVP VOD" })
+                        {
+                            var isChecked = Model.SelectedPlatforms.Contains(p);
+                            <label class="tag-item">
+                                <input type="checkbox" name="selectedPlatforms" value="@p" @(isChecked ? "checked" : "") />
+                                <span class="tag-text">@p</span>
+                            </label>
+                        }
+                    </div>
+                </div>
+
+                <div class="filter-section">
+                    <label class="filter-label">Gatunki</label>
+                    <div class="tags-wrapper scrollable-tags">
+                        @foreach (var g in Model.Genres)
+                        {
+                            var isChecked = Model.SelectedGenres.Contains(g.Id.ToString());
+                            <label class="tag-item">
+                                <input type="checkbox" name="selectedGenres" value="@g.Id" @(isChecked ? "checked" : "") />
+                                <span class="tag-text">@g.Name</span>
+                            </label>
+                        }
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit">
+                    <span class="btn-label">Szukaj tytułów</span>
+                    <span class="loader"></span>
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    <main class="search-results-area">
+        @if ((Model.Movies != null && Model.Movies.Any()) || (Model.Series != null && Model.Series.Any()))
+        {
+            <div class="results-intro">
+                <h3>
+                    @if (string.IsNullOrWhiteSpace(Model.Query))
+                    {
+                        @:Polecane i popularne
+                    }
+                    else
+                    {
+                        @:Wyniki wyszukiwania dla: <strong>"@Model.Query"</strong>
+                    }
+                </h3>
+            </div>
+
+            @if (Model.Kind == MovieMatch.Models.TitleKind.Movie || Model.Kind == MovieMatch.Models.TitleKind.All)
+            {
+                if (Model.Movies != null && Model.Movies.Any())
+                {
+                    <h4 class="section-divider">Filmy</h4>
+                    <div class="cards-grid">
+                        @foreach (var movie in Model.Movies)
+                        {
+                            <div class="movie-card">
+                                <a asp-action="Details" asp-route-tmdbId="@movie.Id" asp-route-kind="Movie" class="card-link">
+                                    <div class="card-image-box">
+                                        @if (!string.IsNullOrEmpty(movie.PosterPath))
+                                        {
+                                            <img src="@GetPosterUrl(movie.PosterPath)" alt="@movie.Title" loading="lazy" />
+                                        }
+                                        else
+                                        {
+                                            <div class="placeholder-poster">Brak okładki</div>
+                                        }
+                                        <div class="score-bubble">@movie.VoteAverage.ToString("0.0")</div>
+                                    </div>
+                                    <div class="card-content">
+                                        <h5 class="card-title">@movie.Title</h5>
+                                        @if (Model.MovieProviders != null && Model.MovieProviders.TryGetValue(movie.Id, out var mProviders) && mProviders.Any())
+                                        {
+                                            <div class="vod-icons">
+                                                @foreach (var p in mProviders.Take(4))
+                                                {
+                                                    <img src="@($"https://image.tmdb.org/t/p/w45{p.LogoPath}")" title="@p.ProviderName" alt="@p.ProviderName" />
+                                                }
+                                            </div>
+                                        }
+                                    </div>
+                                </a>
+                            </div>
+                        }
+                    </div>
+                }
+            }
+
+            @if (Model.Kind == MovieMatch.Models.TitleKind.Series || Model.Kind == MovieMatch.Models.TitleKind.All)
+            {
+                if (Model.Series != null && Model.Series.Any())
+                {
+                    <h4 class="section-divider">Seriale</h4>
+                    <div class="cards-grid">
+                        @foreach (var s in Model.Series)
+                        {
+                            <div class="movie-card">
+                                <a asp-action="Details" asp-route-tmdbId="@s.Id" asp-route-kind="Series" class="card-link">
+                                    <div class="card-image-box">
+                                        @if (!string.IsNullOrEmpty(s.PosterPath))
+                                        {
+                                            <img src="@GetPosterUrl(s.PosterPath)" alt="@s.Name" loading="lazy" />
+                                        }
+                                        else
+                                        {
+                                            <div class="placeholder-poster">Brak okładki</div>
+                                        }
+                                        <div class="score-bubble">@s.VoteAverage.ToString("0.0")</div>
+                                    </div>
+                                    <div class="card-content">
+                                        <h5 class="card-title">@s.Name</h5>
+                                        @if (Model.SeriesProviders != null && Model.SeriesProviders.TryGetValue(s.Id, out var sProviders) && sProviders.Any())
+                                        {
+                                            <div class="vod-icons">
+                                                @foreach (var p in sProviders.Take(4))
+                                                {
+                                                    <img src="@($"https://image.tmdb.org/t/p/w45{p.LogoPath}")" title="@p.ProviderName" alt="@p.ProviderName" />
+                                                }
+                                            </div>
+                                        }
+                                    </div>
+                                </a>
+                            </div>
+                        }
+                    </div>
+                }
+            }
+        }
+        else
+        {
+            <div class="no-results">
+                <div class="icon">📂</div>
+                <h3>Niestety, nic nie znaleziono.</h3>
+                <p>Spróbuj zmienić filtry lub wpisać inną nazwę.</p>
+            </div>
+        }
+    </main>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/pages/search-index.css" asp-append-version="true" />
+}

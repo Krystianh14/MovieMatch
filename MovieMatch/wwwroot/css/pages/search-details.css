@@ -1,0 +1,154 @@
+/* Auto-wyciągnięte z widoku – dla spójności projektu */
+
+.cinema-wrapper {
+            position: relative;
+            background-color: #121212;
+            color: #fff;
+            padding-top: 40px;
+            padding-bottom: 60px;
+            overflow: hidden;
+            border-bottom: 5px solid #e50914;
+        }
+
+        .cinema-backdrop {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-size: cover;
+            background-position: center;
+            opacity: 0.3;
+            filter: blur(8px);
+            z-index: 0;
+        }
+
+        .cinema-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, #121212 0%, rgba(18,18,18,0.6) 50%, #121212 100%);
+            z-index: 1;
+        }
+
+        .content-container {
+            position: relative;
+            z-index: 2;
+        }
+
+        .movie-title {
+            font-weight: 800;
+            font-size: 3rem;
+            text-shadow: 0 4px 10px rgba(0,0,0,0.8);
+        }
+
+        .movie-overview {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #ddd;
+            max-width: 900px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+        }
+
+        .player-section {
+            margin-top: 30px;
+            max-width: 960px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .video-frame {
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 0 40px rgba(229, 9, 20, 0.25);
+            border: 1px solid rgba(255,255,255,0.1);
+            background: #000;
+        }
+
+        .external-trailer-link {
+            color: #aaa;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+            .external-trailer-link:hover {
+                color: #e50914;
+                text-decoration: underline;
+            }
+
+        /* --- BUTTONS --- */
+        .btn-action {
+            width: 100%;
+            padding: 10px;
+            font-weight: 600;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        /* --- RATING --- */
+        .user-rating-panel {
+            background: rgba(255,255,255,0.05);
+            padding: 15px 25px;
+            border-radius: 50px;
+            display: inline-flex;
+            align-items: center;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .rating-stars-modern {
+            direction: rtl;
+            display: inline-flex;
+        }
+
+            .rating-stars-modern input {
+                display: none;
+            }
+
+            .rating-stars-modern label {
+                font-size: 1.8rem;
+                color: #555;
+                cursor: pointer;
+                transition: color 0.2s;
+                padding: 0 4px;
+            }
+
+                .rating-stars-modern input:checked ~ label,
+                .rating-stars-modern label:hover,
+                .rating-stars-modern label:hover ~ label {
+                    color: #e50914;
+                }
+
+        /* --- PLACEHOLDER --- */
+        .no-video-placeholder {
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            color: #777;
+            border: 1px dashed #444;
+        }
+
+            .no-video-placeholder i {
+                font-size: 3rem;
+                margin-bottom: 10px;
+            }
+
+        /* --- KOMENTARZE (AVATAR) --- */
+        .avatar-circle {
+            width: 40px;
+            height: 40px;
+            background: #e9ecef;
+            color: #555;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+/* Drobne uzupełnienia po wyniesieniu CSS z widoku */
+.rating-badge{font-size:1rem;}

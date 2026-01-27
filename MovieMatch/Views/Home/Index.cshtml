@@ -1,0 +1,229 @@
+@model MovieMatch.Models.HomeViewModel
+
+@{
+    ViewData["Title"] = "Strona główna";
+
+    string PosterUrl(string posterPath, int width = 500)
+        => string.IsNullOrWhiteSpace(posterPath) ?
+           "" : $"https://image.tmdb.org/t/p/w{width}{posterPath}";
+
+    string YearFrom(string date)
+        => DateTime.TryParse(date, out var dt) ?
+           dt.Year.ToString() : "";
+}
+
+<div class="home-page-container">
+
+    <section class="immersive-section">
+        <div class="section-header">
+            <h2 class="section-title">TOP 5 FILMÓW</h2>
+            <p class="section-subtitle">Najlepiej oceniane produkcje filmowe</p>
+        </div>
+
+        @if (Model?.TopMovies == null || !Model.TopMovies.Any())
+        {
+            <div class="empty-state">Brak danych do wyświetlenia.</div>
+        }
+        else
+        {
+            <div class="carousel-3d-wrapper" id="carousel-movies">
+                <div class="carousel-stage">
+                    @for (int i = 0; i < Model.TopMovies.Count; i++)
+                    {
+                        var m = Model.TopMovies[i];
+                        <div class="carousel-card" data-index="@i">
+                            <div class="card-visual">
+                                @if (!string.IsNullOrWhiteSpace(m.PosterPath))
+                                {
+                                    <img src="@PosterUrl(m.PosterPath)" alt="@m.Title" />
+                                }
+                                else
+                                {
+                                    <div class="placeholder-img">Brak plakatu</div>
+                                }
+                                <div class="rating-badge">
+                                    ⭐ @m.VoteAverage.ToString("0.0")
+                                </div>
+                            </div>
+
+                            <div class="card-details">
+                                <h3>@m.Title</h3>
+                                <div class="meta">
+                                    @if (!string.IsNullOrWhiteSpace(m.ReleaseDate))
+                                    {
+                                        <span>@YearFrom(m.ReleaseDate)</span>
+                                    }
+                                </div>
+                                <a asp-controller="Search" asp-action="Details" asp-route-tmdbId="@m.Id" asp-route-kind="Movie" class="btn-explore">
+                                    Zobacz szczegóły
+                                </a>
+                            </div>
+                            <div class="click-overlay"></div>
+                        </div>
+                    }
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill"></div>
+                </div>
+            </div>
+        }
+    </section>
+
+    <section class="immersive-section">
+        <div class="section-header">
+            <h2 class="section-title">TOP 5 SERIALI</h2>
+            <p class="section-subtitle">Najlepiej oceniane seriale telewizyjne</p>
+        </div>
+
+        @if (Model?.TopSeries == null || !Model.TopSeries.Any())
+        {
+            <div class="empty-state">Brak danych do wyświetlenia.</div>
+        }
+        else
+        {
+            <div class="carousel-3d-wrapper" id="carousel-series">
+                <div class="carousel-stage">
+                    @for (int i = 0; i < Model.TopSeries.Count; i++)
+                    {
+                        var s = Model.TopSeries[i];
+                        <div class="carousel-card" data-index="@i">
+                            <div class="card-visual">
+                                @if (!string.IsNullOrWhiteSpace(s.PosterPath))
+                                {
+                                    <img src="@PosterUrl(s.PosterPath)" alt="@s.Name" />
+                                }
+                                else
+                                {
+                                    <div class="placeholder-img">Brak plakatu</div>
+                                }
+                                <div class="rating-badge">
+                                    ⭐ @s.VoteAverage.ToString("0.0")
+                                </div>
+                            </div>
+
+                            <div class="card-details">
+                                <h3>@s.Name</h3>
+                                <div class="meta">
+                                    @if (!string.IsNullOrWhiteSpace(s.FirstAirDate))
+                                    {
+                                        <span>@YearFrom(s.FirstAirDate)</span>
+                                    }
+                                </div>
+                                <a asp-controller="Search" asp-action="Details" asp-route-tmdbId="@s.Id" asp-route-kind="Series" class="btn-explore">
+                                    Zobacz szczegóły
+                                </a>
+                            </div>
+                            <div class="click-overlay"></div>
+                        </div>
+                    }
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill"></div>
+                </div>
+            </div>
+        }
+    </section>
+
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/pages/home-index.css" asp-append-version="true" />
+}
+@section Scripts {
+    <script>
+        class Carousel3D {
+            constructor(elementId, cycleTimeMs = 10000) {
+                this.wrapper = document.getElementById(elementId);
+                if (!this.wrapper) return;
+
+                this.cards = Array.from(this.wrapper.querySelectorAll('.carousel-card'));
+                this.count = this.cards.length;
+                this.currentIndex = 0;
+                this.cycleTime = cycleTimeMs;
+                this.timer = null;
+                this.progressBar = this.wrapper.querySelector('.progress-fill');
+                this.progressTrack = this.wrapper.querySelector('.progress-track');
+
+                this.init();
+            }
+
+            init() {
+                this.cards.forEach((card, index) => {
+                    const overlay = card.querySelector('.click-overlay');
+                    if (overlay) {
+                        overlay.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            this.manualSwitch(index);
+                        });
+                    }
+                });
+
+                this.render();
+                this.startTimer();
+            }
+
+            getIndices() {
+                const current = this.currentIndex;
+                const prev = (current - 1 + this.count) % this.count;
+                const next = (current + 1) % this.count;
+                return { prev, current, next };
+            }
+
+            render() {
+                const { prev, current, next } = this.getIndices();
+
+                this.cards.forEach((card, i) => {
+                    card.classList.remove('active', 'prev', 'next');
+
+                    if (i === current) card.classList.add('active');
+                    else if (i === prev) card.classList.add('prev');
+                    else if (i === next) card.classList.add('next');
+
+                });
+            }
+
+            next() {
+                this.currentIndex = (this.currentIndex + 1) % this.count;
+                this.render();
+            }
+
+            resetProgressBar() {
+                if (this.progressTrack) {
+                    this.progressTrack.classList.remove('animating');
+                    void this.progressTrack.offsetWidth;
+                    this.progressTrack.classList.add('animating');
+                }
+            }
+
+            startTimer() {
+                this.stopTimer();
+                this.resetProgressBar();
+                this.timer = setInterval(() => {
+                    this.next();
+                    this.resetProgressBar();
+                }, this.cycleTime);
+            }
+
+            stopTimer() {
+                if (this.timer) {
+                    clearInterval(this.timer);
+                    this.timer = null;
+                }
+            }
+
+            manualSwitch(index) {
+                this.currentIndex = index;
+                this.render();
+                this.startTimer();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            new Carousel3D('carousel-movies', 10000);
+
+            setTimeout(() => {
+                new Carousel3D('carousel-series', 10000);
+            }, 5000);
+        });
+    </script>
+}

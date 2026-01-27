@@ -1,0 +1,171 @@
+/* =========================
+   AUTH (Login/Register) UI
+   ========================= */
+.auth-page {
+    padding: 60px 0;
+}
+
+.auth-card {
+    border: none;
+    border-radius: 16px;
+}
+
+.auth-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--dark-text);
+}
+
+.auth-subtitle {
+    color: #666;
+}
+
+.auth-link {
+    color: var(--primary-red);
+    text-decoration: none;
+}
+
+    .auth-link:hover {
+        text-decoration: underline;
+    }
+
+.auth-footer {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    color: #666;
+}
+
+/* =========================
+   ACCOUNT (Manage) UI
+   ========================= */
+.account-page {
+    padding: 40px 0 60px;
+}
+
+.account-title {
+    font-weight: 800;
+    letter-spacing: -0.3px;
+}
+
+.account-subtitle {
+    color: #666;
+}
+
+.account-nav, .account-content {
+    border: none;
+    border-radius: 16px;
+}
+
+.account-nav-list .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-weight: 600;
+    color: #555;
+}
+
+    .account-nav-list .nav-link i {
+        width: 18px;
+        text-align: center;
+        color: inherit;
+    }
+
+    .account-nav-list .nav-link:hover {
+        background-color: rgba(229, 9, 20, 0.08);
+        color: var(--primary-red);
+    }
+
+    .account-nav-list .nav-link.active {
+        background-color: var(--primary-red);
+        color: #fff;
+    }
+
+/* Streaming platforms */
+.platform-list .platform-icon {
+    width: 18px;
+    text-align: center;
+    color: inherit;
+}
+
+.platform-item .form-check-input {
+    margin-top: 0.2rem;
+}
+
+/* Ikony w navbar i dropdown zawsze w kolorze tekstu */
+.navbar .nav-link i,
+.navbar .dropdown-item i {
+    color: inherit !important;
+}
+
+/*  =========================
+    ACCOUNT NAV (Manage)
+     ========================= */
+.account-nav-list .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-radius: 12px;
+    padding: 10px 12px;
+    font-weight: 600;
+    color: #555;
+    position: relative;
+    transition: background-color .2s ease, color .2s ease;
+}
+
+    .account-nav-list .nav-link i {
+        width: 18px;
+        text-align: center;
+        color: inherit;
+    }
+
+    .account-nav-list .nav-link:hover {
+        background-color: rgba(229, 9, 20, 0.08);
+        color: var(--primary-red);
+    }
+
+
+    .account-nav-list .nav-link.active {
+        background-color: rgba(229, 9, 20, 0.12);
+        color: var(--primary-red);
+        font-weight: 800;
+    }
+
+
+        .account-nav-list .nav-link.active::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 8px;
+            bottom: 8px;
+            width: 4px;
+            border-radius: 4px;
+            background: var(--primary-red);
+        }
+
+/* =========================
+    MANAGE CONTENT TYPOGRAPHY
+   ========================= */
+.account-content h3,
+.account-content h4 {
+    font-weight: 800;
+    letter-spacing: -0.2px;
+    margin-bottom: 14px;
+}
+
+.account-content label {
+    font-weight: 700;
+}
+
+.account-content .form-control,
+.account-content .form-select {
+    border-radius: 12px;
+    padding: 10px 12px;
+}
+
+.account-content .btn-primary {
+    border-radius: 12px;
+    font-weight: 700;
+}

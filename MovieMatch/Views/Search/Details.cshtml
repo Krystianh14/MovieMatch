@@ -1,0 +1,212 @@
+@model MovieMatch.Models.TitleDetailsViewModel
+@using MovieMatch.Models
+
+@{
+    var isSeries = Model.Kind == TitleKind.Series;
+    var title = isSeries ? Model.Series?.Name : Model.Movie?.Title;
+    var posterPath = isSeries ? Model.Series?.PosterPath : Model.Movie?.PosterPath;
+    var backdropPath = isSeries ? Model.Series?.BackdropPath : Model.Movie?.BackdropPath;
+    var rating = isSeries ? Model.Series?.VoteAverage : Model.Movie?.VoteAverage;
+    var date = isSeries ? Model.Series?.FirstAirDate : Model.Movie?.ReleaseDate;
+    var overview = isSeries ? Model.Series?.Overview : Model.Movie?.Overview;
+
+    ViewData["Title"] = title;
+
+    var trailerUrl = Model.TrailerUrl;
+    string? trailerEmbedUrl = null;
+    string? videoKey = null;
+
+    if (!string.IsNullOrWhiteSpace(trailerUrl))
+    {
+        if (trailerUrl.Contains("youtube.com/watch", StringComparison.OrdinalIgnoreCase))
+        {
+            var idx = trailerUrl.IndexOf("v=", StringComparison.OrdinalIgnoreCase);
+            if (idx >= 0)
+            {
+                var key = trailerUrl.Substring(idx + 2);
+                var amp = key.IndexOf('&');
+                if (amp >= 0) key = key.Substring(0, amp);
+                videoKey = key;
+            }
+        }
+        else if (trailerUrl.Contains("youtu.be/", StringComparison.OrdinalIgnoreCase))
+        {
+            var idx = trailerUrl.IndexOf("youtu.be/", StringComparison.OrdinalIgnoreCase);
+            if (idx >= 0)
+            {
+                var key = trailerUrl.Substring(idx + "youtu.be/".Length);
+                var cut = key.IndexOfAny(new[] { '?', '&', '/' });
+                if (cut >= 0) key = key.Substring(0, cut);
+                videoKey = key;
+            }
+        }
+
+        if (!string.IsNullOrEmpty(videoKey))
+        {
+            trailerEmbedUrl = $"https://www.youtube.com/embed/{videoKey}?rel=0&showinfo=0&iv_load_policy=3";
+        }
+    }
+
+    var bgImage = !string.IsNullOrEmpty(backdropPath)
+        ? $"https://image.tmdb.org/t/p/original{backdropPath}"
+        : "";
+}
+
+<div class="cinema-wrapper">
+
+    @if (!string.IsNullOrEmpty(bgImage))
+    {
+        <div class="cinema-backdrop" style="background-image: url('@bgImage');"></div>
+    }
+    <div class="cinema-overlay"></div>
+
+    <div class="container content-container">
+
+        <div class="row align-items-end mb-4">
+            <div class="col-lg-8">
+                <h1 class="movie-title">@title</h1>
+                <div class="movie-meta">
+                    <span class="badge bg-danger mb-2 rating-badge">⭐ @(rating?.ToString("0.0"))</span>
+                    <span class="text-white-50 ms-2">Premiera: @date</span>
+                </div>
+                <p class="movie-overview">@overview</p>
+            </div>
+
+            @if (User.Identity?.IsAuthenticated == true)
+            {
+                <div class="col-lg-4 text-lg-end mt-3 mt-lg-0">
+                    <div class="d-flex flex-column gap-2">
+                        <form asp-action="ToggleFavorite" method="post">
+                            <input type="hidden" name="tmdbId" value="@Model.TmdbId" />
+                            <input type="hidden" name="kind" value="@Model.Kind" />
+                            <button type="submit" class="btn btn-action @(Model.UserTitle?.IsFavorite == true ? "btn-warning" : "btn-outline-light")">
+                                <i class="fa-solid fa-heart"></i> @(Model.UserTitle?.IsFavorite == true ? "Usuń z ulubionych" : "Dodaj do ulubionych")
+                            </button>
+                        </form>
+
+                        <form asp-action="ToggleWatchLater" method="post">
+                            <input type="hidden" name="tmdbId" value="@Model.TmdbId" />
+                            <input type="hidden" name="kind" value="@Model.Kind" />
+                            <button type="submit" class="btn btn-action @(Model.UserTitle?.WatchLater == true ? "btn-info" : "btn-outline-light")">
+                                <i class="fa-solid fa-clock"></i> @(Model.UserTitle?.WatchLater == true ? "Usuń z listy" : "Do obejrzenia")
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+
+        @if (!string.IsNullOrEmpty(trailerEmbedUrl))
+        {
+            <div class="player-section">
+                <div class="ratio ratio-16x9 video-frame">
+                    <iframe src="@trailerEmbedUrl"
+                            title="Zwiastun @title"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                            allowfullscreen>
+                    </iframe>
+                </div>
+
+                <div class="text-center mt-3">
+                    <a href="@Model.TrailerUrl" target="_blank" class="external-trailer-link">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i> Obejrzyj zwiastun w nowym oknie (YouTube)
+                    </a>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="no-video-placeholder">
+                <i class="fa-solid fa-video-slash"></i>
+                <p>Brak zwiastuna dla tego tytułu.</p>
+            </div>
+        }
+
+        @if (User.Identity?.IsAuthenticated == true)
+        {
+            <div class="user-rating-panel mt-5">
+                <span class="me-3">Twoja ocena:</span>
+                <form asp-action="RateTitle" method="post" class="d-inline-block">
+                    <input type="hidden" name="tmdbId" value="@Model.TmdbId" />
+                    <input type="hidden" name="kind" value="@Model.Kind" />
+
+                    <div class="rating-stars-modern">
+                        @for (int i = 5; i >= 1; i--)
+                        {
+                            var isChecked = Model.UserTitle?.UserRating == i;
+                            <input type="radio" id="star-@i" name="rating" value="@i" @(isChecked ? "checked" : "") onchange="this.form.submit()" />
+                            <label for="star-@i" title="@i gwiazdek"><i class="fa-solid fa-star"></i></label>
+                        }
+                    </div>
+                </form>
+                @if (Model.AverageRating.HasValue)
+                {
+                    <span class="ms-4 text-white-50 small">Średnia społeczności: @Model.AverageRating.Value.ToString("0.0")/5</span>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="mt-4 text-center">
+                <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-primary">Zaloguj się, aby ocenić</a>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="container mt-5 mb-5">
+    <h3 class="border-bottom pb-2 mb-4">Dyskusja</h3>
+
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <div class="card mb-4 shadow-sm">
+            <div class="card-body">
+                <form asp-action="AddComment" method="post">
+                    <input type="hidden" name="tmdbId" value="@Model.TmdbId" />
+                    <input type="hidden" name="kind" value="@Model.Kind" />
+
+                    <div class="mb-2">
+                        <textarea name="content" class="form-control" rows="3" placeholder="Napisz co sądzisz o tym tytule..."></textarea>
+                    </div>
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-dark btn-sm">Dodaj komentarz</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    }
+
+    @if (Model.Comments.Any())
+    {
+        <div class="comments-list">
+            @foreach (var c in Model.Comments)
+            {
+                <div class="d-flex gap-3 mb-3 p-3 bg-light rounded border">
+                    <div class="flex-shrink-0">
+                        <div class="avatar-circle">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="d-flex align-items-center gap-2">
+                            <strong class="text-dark">@(c.User?.Nick ?? "Użytkownik")</strong>
+                            <span class="text-muted small">@c.CreatedAt.ToLocalTime().ToString("g")</span>
+                        </div>
+                        <p class="mb-0 mt-1 text-secondary">@c.Content</p>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="text-center text-muted py-4">
+            <i class="fa-regular fa-comment-dots fa-2x mb-2"></i>
+            <p>Brak komentarzy. Bądź pierwszą osobą, która wyrazi opinię!</p>
+        </div>
+    }
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/pages/search-details.css" asp-append-version="true" />
+}

@@ -1,0 +1,47 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Profile";
+    ViewData["ActivePage"] = ManageNavPages.Index;
+}
+
+<h3>@ViewData["Title"]</h3>
+<partial name="_StatusMessage" for="StatusMessage" />
+<div class="row">
+    <div class="col-md-6">
+        <form id="profile-form" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+            <div class="form-floating mb-3">
+                <input asp-for="Username" class="form-control"  disabled />
+                <label asp-for="Username" class="form-label">E-mail</label>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Nick" class="form-control" placeholder="Nick" disabled />
+                <label asp-for="Nick" class="form-label">Nazwa użytkownika</label>
+            </div>
+
+            <div class="form-floating mb-3">
+                <input asp-for="Input.PhoneNumber" class="form-control" />
+                <label asp-for="Input.PhoneNumber" class="form-label">Numer telefonu</label>
+                <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+            </div>
+
+            @{
+                if (!string.IsNullOrEmpty(Model.Input.PhoneNumber))
+                {
+                    <button type="submit" asp-page-handler="DeletePhone" class="mb-3 w-100 btn-lg btn btn-danger "> Usuń numer telefonu</button>
+                    <button id="update-profile-button" type="submit" class="w-100 btn-lg btn btn-primary">Zmień numer telefonu</button>
+              }}
+
+               @{
+                if (string.IsNullOrEmpty(Model.Input.PhoneNumber))
+                {
+                    <button id="update-profile-button" type="submit" class="w-100 btn-lg btn btn-primary">Zapisz numer telefonu</button>
+                }}
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

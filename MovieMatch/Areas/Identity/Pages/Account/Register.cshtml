@@ -1,0 +1,104 @@
+@page
+@model MovieMatch.Areas.Identity.Pages.Account.RegisterModel
+@{
+    ViewData["Title"] = "Rejestracja";
+}
+
+<div class="auth-page">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-6 col-lg-5">
+                <div class="card auth-card shadow-sm">
+                    <div class="card-body p-4">
+
+                        <h1 class="auth-title mb-1">Zarejestruj się</h1>
+                        <p class="auth-subtitle mb-4">
+                            Utwórz konto, aby zapisywać listy i platformy streamingowe.
+                        </p>
+
+                        <form id="registerForm" method="post" class="auth-form">
+
+                            <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+                            <!-- EMAIL -->
+                            <div class="mb-3">
+                                <label asp-for="Input.Email" class="form-label fw-bold"></label>
+                                <input asp-for="Input.Email" class="form-control"
+                                       autocomplete="username"
+                                       placeholder="przykladowy@email.com" />
+                                <span asp-validation-for="Input.Email" class="text-danger"></span>
+                            </div>
+
+                            <!-- NICK -->
+                            <div class="mb-3">
+                                <label asp-for="Input.Nick" class="form-label fw-bold"></label>
+                                <input asp-for="Input.Nick" class="form-control"
+                                       placeholder="Twój nick" />
+                                <span asp-validation-for="Input.Nick" class="text-danger"></span>
+                            </div>
+
+                            <!-- PASSWORD -->
+                            <div class="mb-3">
+                                <label asp-for="Input.Password" class="form-label fw-bold">Hasło</label>
+                                <input asp-for="Input.Password" class="form-control"
+                                       autocomplete="new-password" />
+                                <span asp-validation-for="Input.Password" class="text-danger"></span>
+                            </div>
+
+                            <!-- CONFIRM PASSWORD -->
+                            <div class="mb-3">
+                                <label asp-for="Input.ConfirmPassword"  class="form-label fw-bold">Potwierdź hasło</label>
+                                <input asp-for="Input.ConfirmPassword" class="form-control" 
+                                       autocomplete="new-password" />
+                                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+                            </div>
+
+                            <!-- PLATFORMY STREAMINGOWE -->
+                            <div class="mt-4">
+                                <label class="fw-bold">Posiadane platformy streamingowe (opcjonalnie):</label>
+
+                                <div class="mt-2 platform-list">
+                                    @foreach (var p in Model.AllPlatforms)
+                                    {
+                                        var id = $"platform_{p.GetHashCode()}";
+                                        <div class="form-check mb-2 platform-item">
+                                            <input class="form-check-input"
+                                                   type="checkbox"
+                                                   id="@id"
+                                                   name="SelectedPlatforms"
+                                                   value="@p" />
+                                            <label class="form-check-label d-flex align-items-center gap-2" for="@id">
+                                                <i class="@Model.IconClass(p) platform-icon"></i>
+                                                <span>@p</span>
+                                            </label>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100 btn-lg mt-4">
+                                Zarejestruj się
+                            </button>
+
+                            <div class="auth-footer mt-3">
+                                <span>Masz już konto?</span>
+                                <a asp-page="./Login" class="auth-link fw-semibold">Zaloguj się</a>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+
+                <div class="auth-back mt-3 text-center">
+                    <a asp-controller="Home" asp-action="Index" class="auth-link">
+                        ← Wróć na stronę główną
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

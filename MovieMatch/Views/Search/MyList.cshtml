@@ -1,0 +1,94 @@
+﻿@model MovieMatch.Models.MyListViewModel
+
+@{
+    ViewData["Title"] = "Moja lista";
+}
+
+<h2>Moja lista</h2>
+
+@if (!User.Identity.IsAuthenticated)
+{
+    <p>
+        <a asp-area="Identity" asp-page="/Account/Login">Zaloguj się</a>, aby zobaczyć swoje ulubione i listę „do obejrzenia”.
+    </p>
+}
+else
+{
+    if (!Model.FavoriteMovies.Any() && !Model.FavoriteSeries.Any()
+        && !Model.WatchLaterMovies.Any() && !Model.WatchLaterSeries.Any())
+    {
+        <p>Nie masz jeszcze żadnych tytułów na liście. Wejdź w szczegóły filmu/serialu i dodaj go do ulubionych lub listy „do obejrzenia”.</p>
+    }
+    else
+    {
+        if (Model.FavoriteMovies.Any() || Model.FavoriteSeries.Any())
+        {
+            <hr />
+            <h3 id="favorites">Ulubione</h3>
+            <div class="results-grid">
+                @foreach (var movie in Model.FavoriteMovies)
+                {
+                    <div class="result-card">
+                        <a asp-action="Details" asp-route-tmdbId="@movie.Id" asp-route-kind="Movie">
+                            <img src="@($"https://image.tmdb.org/t/p/w200{movie.PosterPath}")" alt="@movie.Title" />
+
+                            <div class="result-title">@movie.Title</div>
+                            <div class="result-rating">⭐ @movie.VoteAverage.ToString("0.00")</div>
+                            <p class="btn btn-sm btn-outline-primary mt-2">Szczegóły</p>
+                        </a>
+                        </div>
+                }
+
+                @foreach (var s in Model.FavoriteSeries)
+                {
+                    <div class="result-card">
+                        <a asp-action="Details" asp-route-tmdbId="@s.Id" asp-route-kind="Series">
+                            <img src="@($"https://image.tmdb.org/t/p/w200{s.PosterPath}")" alt="@s.Name" />
+
+                            <div class="result-title">@s.Name</div>
+                            <div class="result-rating">⭐ @s.VoteAverage.ToString("0.00")</div>
+
+                            <p class="btn btn-sm btn-outline-primary mt-2">Szczegóły</p>
+                        </a>
+                    </div>
+                }
+          </div>
+
+        }
+
+        if (Model.WatchLaterMovies.Any() || Model.WatchLaterSeries.Any())
+        {
+            <hr />
+            <h3 id="watchLater">Do obejrzenia</h3>
+            <div class="results-grid">
+                @foreach (var movie in Model.WatchLaterMovies)
+                {
+
+                    <div class="result-card">
+                        <a asp-action="Details" asp-route-tmdbId="@movie.Id" asp-route-kind="Movie">
+                            <img src="@($"https://image.tmdb.org/t/p/w200{movie.PosterPath}")" alt="@movie.Title" />
+
+                            <div class="result-title">@movie.Title</div>
+                            <div class="result-rating">⭐ @movie.VoteAverage.ToString("0.00")</div>
+                            <p class="btn btn-sm btn-outline-primary mt-2">Szczegóły</p>
+                        </a>
+                    </div>
+                }
+
+                @foreach (var s in Model.WatchLaterSeries)
+                {
+                <div class="result-card">
+                    <a asp-action="Details" asp-route-tmdbId="@s.Id" asp-route-kind="Series">
+                        <img src="@($"https://image.tmdb.org/t/p/w200{s.PosterPath}")" alt="@s.Name" />
+
+                        <div class="result-title">@s.Name</div>
+                        <div class="result-rating">⭐ @s.VoteAverage.ToString("0.00")</div>
+
+                        <p class="btn btn-sm btn-outline-primary mt-2">Szczegóły</p>
+                    </a>
+                    </div>
+                }
+            </div>
+        }
+    }
+}

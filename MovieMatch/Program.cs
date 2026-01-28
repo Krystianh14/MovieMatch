@@ -45,9 +45,8 @@ using (var scope = app.Services.CreateScope())
     if (db.Database.IsSqlite())
     {
         Directory.CreateDirectory("/data");
-        db.Database.EnsureCreated();
+        db.Database.Migrate();
     }
-
     else
     {
         db.Database.Migrate();

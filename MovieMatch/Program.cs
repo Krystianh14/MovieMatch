@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-using MovieMatch.Data;
+
 using MovieMatch.Models;
 using MovieMatch.Services;
 using System.IO;

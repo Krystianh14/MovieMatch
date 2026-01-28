@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using MovieMatch.Models;
 
 namespace MovieMatch.Models
@@ -6,7 +6,7 @@ namespace MovieMatch.Models
     public class UserTitle
     {
         public int Id { get; set; }
-
+        public TitleKind Kind { get; set; }
         public string UserId { get; set; }
         public int TmdbId { get; set; }
 

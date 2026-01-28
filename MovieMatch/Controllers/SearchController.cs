@@ -309,10 +309,10 @@ namespace MovieMatch.Controllers
             return name;
         }
 
-        private async Task<UserTitle> GetOrCreateUserTitleAsync(string userId, int tmdbId)
+        private async Task<UserTitle> GetOrCreateUserTitleAsync(string userId, int tmdbId, TitleKind kind)
         {
             var existing = await _db.UserTitles
-                .FirstOrDefaultAsync(ut => ut.UserId == userId && ut.TmdbId == tmdbId);
+                .FirstOrDefaultAsync(ut => ut.UserId == userId && ut.TmdbId == tmdbId && ut.Kind == kind);
 
             if (existing != null)
                 return existing;
@@ -321,6 +321,7 @@ namespace MovieMatch.Controllers
             {
                 UserId = userId,
                 TmdbId = tmdbId,
+                Kind = kind,
                 IsFavorite = false,
                 WatchLater = false
             };
@@ -330,6 +331,7 @@ namespace MovieMatch.Controllers
 
             return newItem;
         }
+
 
         public async Task<IActionResult> Details(int tmdbId, TitleKind kind = TitleKind.All)
         {
@@ -367,13 +369,15 @@ namespace MovieMatch.Controllers
             {
                 var userId = _userManager.GetUserId(User);
                 userTitle = await _db.UserTitles
-                    .FirstOrDefaultAsync(ut => ut.UserId == userId && ut.TmdbId == tmdbId);
+                    .FirstOrDefaultAsync(ut => ut.UserId == userId && ut.TmdbId == tmdbId && ut.Kind == kind);
+
             }
 
             // Średnia ocena
             double? avg = null;
             var ratingsQuery = _db.UserTitles
-                .Where(ut => ut.TmdbId == tmdbId && ut.UserRating.HasValue);
+                .Where(ut => ut.TmdbId == tmdbId && ut.Kind == kind && ut.UserRating.HasValue);
+
 
             if (await ratingsQuery.AnyAsync())
             {
@@ -426,7 +430,7 @@ namespace MovieMatch.Controllers
         public async Task<IActionResult> ToggleFavorite(int tmdbId, TitleKind kind)
         {
             var userId = _userManager.GetUserId(User);
-            var status = await GetOrCreateUserTitleAsync(userId, tmdbId);
+            var status = await GetOrCreateUserTitleAsync(userId, tmdbId, kind);
 
             status.IsFavorite = !status.IsFavorite;
             status.LastUpdated = DateTime.UtcNow;
@@ -442,7 +446,7 @@ namespace MovieMatch.Controllers
         public async Task<IActionResult> ToggleWatchLater(int tmdbId, TitleKind kind)
         {
             var userId = _userManager.GetUserId(User);
-            var status = await GetOrCreateUserTitleAsync(userId, tmdbId);
+            var status = await GetOrCreateUserTitleAsync(userId, tmdbId, kind);
 
             status.WatchLater = !status.WatchLater;
             status.LastUpdated = DateTime.UtcNow;
@@ -461,7 +465,7 @@ namespace MovieMatch.Controllers
                 return RedirectToAction(nameof(Details), new { tmdbId, kind });
 
             var userId = _userManager.GetUserId(User);
-            var status = await GetOrCreateUserTitleAsync(userId, tmdbId);
+            var status = await GetOrCreateUserTitleAsync(userId, tmdbId, kind);
 
             status.UserRating = rating;
             status.LastUpdated = DateTime.UtcNow;
@@ -484,43 +488,26 @@ namespace MovieMatch.Controllers
 
             foreach (var ut in userTitles)
             {
-                TmdbMovieDto? movie = null;
-                TmdbTvDto? series = null;
-
-                try
+                if (ut.Kind == TitleKind.Movie)
                 {
-                    movie = await _tmdb.GetMovieDetailsAsync(ut.TmdbId);
+                    var movie = await _tmdb.GetMovieDetailsAsync(ut.TmdbId);
+                    if (movie != null)
+                    {
+                        if (ut.IsFavorite) vm.FavoriteMovies.Add(movie);
+                        if (ut.WatchLater) vm.WatchLaterMovies.Add(movie);
+                    }
                 }
-                catch (HttpRequestException)
+                else if (ut.Kind == TitleKind.Series)
                 {
-                }
-
-                if (movie != null)
-                {
-                    if (ut.IsFavorite)
-                        vm.FavoriteMovies.Add(movie);
-                    if (ut.WatchLater)
-                        vm.WatchLaterMovies.Add(movie);
-
-                    continue;
-                }
-
-                try
-                {
-                    series = await _tmdb.GetSeriesDetailsAsync(ut.TmdbId);
-                }
-                catch (HttpRequestException)
-                {
-                }
-
-                if (series != null)
-                {
-                    if (ut.IsFavorite)
-                        vm.FavoriteSeries.Add(series);
-                    if (ut.WatchLater)
-                        vm.WatchLaterSeries.Add(series);
+                    var series = await _tmdb.GetSeriesDetailsAsync(ut.TmdbId);
+                    if (series != null)
+                    {
+                        if (ut.IsFavorite) vm.FavoriteSeries.Add(series);
+                        if (ut.WatchLater) vm.WatchLaterSeries.Add(series);
+                    }
                 }
             }
+
 
             return View(vm);
         }
